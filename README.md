@@ -9,12 +9,12 @@ Tracking internet speed using influx and grafana
 3. Link script to /usr/local/bin
 	1. `ln -s /usr/local/src/speedtest-to-influx/speedtest-to-influx.py /usr/local/bin/speedtest-to-influx.py `
 4. Create cron job
-	1. `vi /etc/cron.d/speedtest-to-influx`
-           ```
+	1. `v /etc/cron.d/speedtest-to-influx`
+```
 	   SHELL=/bin/sh
 	   PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 	   
 	   05 3    * * *   root    /usr/local/bin/speedtest-to-influx.py
-           ```
+``` 
 5. Sample Influx query for dashboard:
    `SELECT mean("download.bandwidth") AS "Down", mean("upload.bandwidth") AS "Up" FROM "speedtest" WHERE $timeFilter GROUP BY time($__interval), "isp" fill(linear)`
