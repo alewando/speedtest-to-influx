@@ -178,7 +178,7 @@ if args.debug:
 
 if args.daemon:
     schedule.every(args.interval_mins).minutes.do(test_and_record)
-    # schedule.every(5).seconds.do(process_devices)
+    test_and_record()
     while True:
         schedule.run_pending()
         time.sleep(60)
