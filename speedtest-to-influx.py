@@ -79,7 +79,7 @@ INFLUX_DATABASE = os.getenv("INFLUX_DATABASE", "speedtest")
 def speedtest_results():
     # Execute the command and capture the output
     logging.debug("Running speed test")
-    result = subprocess.run("speedtest -f json", shell=True, capture_output=True, text=True)
+    result = subprocess.run("/usr/bin/speedtest -f json", shell=True, capture_output=True, text=True)
     #result = subprocess.run("cat /tmp/speedtest.json", shell=True, capture_output=True, text=True)
 
     # Check if the command was successful
@@ -99,6 +99,9 @@ def speedtest_results():
 # Flattest nested structures in a dict to produce a 1-level-deep dict, using a separator ('.') to indicate nesting
 def flatten_dict(dictionary, parent_key='', sep='.'):
     flattened_dict = {}
+    if not dictionary:
+        logging.error("Empty dictionary, cannot flatten")
+        return {}
     for key, value in dictionary.items():
         new_key = f"{parent_key}{sep}{key}" if parent_key else key
         if isinstance(value, dict):
@@ -113,6 +116,10 @@ def convert_results_to_influx_datapoint(results_json):
     flattened = flatten_dict(results_json)
     point = {"measurement": "speedtest"}
     tags = {}
+
+    # Fix the datatypes of some fields
+    if isinstance(flattened.get("packetLoss", None), int):
+        flattened['packetLoss'] = float(flattened['packetLoss'])
 
     # Pull out some values as tags
     tag_fields = ["isp","server.ip","server.name","server.id"]
